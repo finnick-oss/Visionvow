@@ -1,0 +1,150 @@
+{% extends '../base/base.html' %}
+
+{% block title %} Dashboard {% endblock title %}
+
+{% block nav %}
+<header>
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url '/' %}">Visionvow</a>
+      <a class="btn btn-sm-3 btn-danger" href="{% url 'logout'%}" >Logout</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>          
+    </div>
+  </nav>
+</header>
+{% endblock nav %}
+
+{% block main %}
+<div class="container-fluid pt-5">
+  <div class="row">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="position-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{% url 'dashboard' %}">
+              <span data-feather="home"></span>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'password_change' %}">
+              <span data-feather="file"></span>
+              Change Password
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'profile' %}">
+              <span data-feather="file"></span>
+              Profile
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group me-2">
+          </div>
+          <a href="{% url 'export-csv' %}" class="btn btn-sm btn-outline-secondary">Export</a>
+        </div>
+      </div>
+      <form class="row gy-2 gx-3 align-items-center" method="POST">
+        {% csrf_token %}
+        <div class="col-sm">
+          <input type="text" name="uni" class="form-control" placeholder="Universal">
+        </div>
+        <div class="col-sm">
+          <input type="text" name="p_id" class="form-control" placeholder="PID">
+        </div>
+        <div class="col-sm">
+          <div class="input-group-sm">
+            <input type="text" name="u_ide" class="form-control" placeholder="UID Ends-with">
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="input-group-sm">
+            <input type="text" name="u_ids" class="form-control" placeholder="UID starts-with">
+          </div>
+        </div>
+        <div class="col-sm">
+          <div class="input-group-sm">
+            <input type="date" name="date" class="form-control" placeholder="Date">
+          </div>
+        </div>
+        <div class="col-sm">
+          <select class="form-select" name="status">
+            <option style="display: none;" selected value="" >Status...</option>
+            <option value="complete">Complete</option>
+            <option value="terminate">Terminate</option>
+            <option value="quotafull">Quotafull</option>
+          </select>
+        </div>
+        <div class="col-sm">
+          <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+      </form>
+
+      <span>Total ({{page_obj.paginator.count}})</span>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover table-sm">
+          <thead>
+            <tr>
+              <th scope="col">Serial NO.</th>
+              <th scope="col">Project ID</th>
+              <th scope="col">User ID</th>
+              <th scope="col">Status</th>
+              <th scope="col">IP Address</th>
+              <th scope="col">Completion Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in page_obj %}
+            <tr>
+              <td>{{forloop.counter}}</td>
+              <td>{{i.pid}}</td>
+              <td>{{i.uid}}</td>
+              <td>{{i.status|title}}</td>
+              <td>{{i.ip}}</td>
+              <td>{{i.completionTime}}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+          {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{page_obj.previous_page_number}}">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="?page={{page_obj.previous_page_number}}">{{page_obj.previous_page_number}}</a></li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link">Previous</a>
+          </li>
+          {% endif %}
+          <li class="page-item active" aria-current="page">
+            <a class="page-link" href="#">{{page_obj.number}}</a>
+          </li>
+          {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{page_obj.next_page_number}}">{{page_obj.next_page_number}}</a></li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{page_obj.next_page_number}}">Next</a>
+          </li>
+          {% else %}
+          <li class="page-item disabled">
+            <a class="page-link">Next</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </main>
+  </div>
+</div>
+{% endblock main %}
